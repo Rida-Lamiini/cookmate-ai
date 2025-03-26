@@ -10,13 +10,15 @@ import {
 } from "react-native";
 import { Marquee } from "@animatereactnative/marquee";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { Feather } from "@expo/vector-icons"; // Assuming you have Expo vector icons
+import { Feather } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 
 // Get screen dimensions for responsive layout
-const { width, height } = Dimensions.get("window");
+const { width } = Dimensions.get("window");
 
 export default function Landing() {
-  // We'll keep the image list as is
+  const router = useRouter();
+
   const imageList = [
     require("../assets/images/1.jpg"),
     require("../assets/images/c1.jpg"),
@@ -32,51 +34,11 @@ export default function Landing() {
   return (
     <GestureHandlerRootView style={styles.root}>
       <ScrollView bounces={false} showsVerticalScrollIndicator={false}>
-        {/* Marquee section with background gradient */}
+        {/* Marquee section */}
         <View style={styles.marqueeContainer}>
-          {/* First marquee - slow speed */}
-          <Marquee spacing={10} speed={0.5} style={styles.marqueeRotate}>
-            <View style={styles.marquee}>
-              {imageList.map((image, index) => (
-                <Image
-                  source={image}
-                  key={`image-1-${index}`}
-                  style={styles.image}
-                />
-              ))}
-            </View>
-          </Marquee>
-
-          {/* Second marquee - medium speed, opposite direction */}
-          <Marquee
-            spacing={10}
-            speed={0.8}
-            rtl={true} // Right to left for variety
-            style={[styles.marqueeRotate, { marginVertical: 15 }]}
-          >
-            <View style={styles.marquee}>
-              {imageList.map((image, index) => (
-                <Image
-                  source={image}
-                  key={`image-2-${index}`}
-                  style={styles.image}
-                />
-              ))}
-            </View>
-          </Marquee>
-
-          {/* Third marquee - slow speed again */}
-          <Marquee spacing={10} speed={0.5} style={styles.marqueeRotate}>
-            <View style={styles.marquee}>
-              {imageList.map((image, index) => (
-                <Image
-                  source={image}
-                  key={`image-3-${index}`}
-                  style={styles.image}
-                />
-              ))}
-            </View>
-          </Marquee>
+          <MarqueeRow images={imageList} speed={0.5} />
+          <MarqueeRow images={imageList} speed={0.8} rtl={true} />
+          <MarqueeRow images={imageList} speed={0.5} />
         </View>
 
         {/* Content section */}
@@ -84,12 +46,15 @@ export default function Landing() {
           <Text style={styles.title}>
             Cookmate AI 🥗🔍 | Find, Create & Enjoy Delicious Recipes!
           </Text>
-
           <Text style={styles.subtitle}>
             Generate delicious recipes in seconds with the power of AI! 🍔✨
           </Text>
 
-          <TouchableOpacity style={styles.button} activeOpacity={0.8}>
+          <TouchableOpacity
+            style={styles.button}
+            activeOpacity={0.8}
+            onPress={() => router.push("/(auth)/sign-up")}
+          >
             <Text style={styles.buttonText}>Get Started</Text>
             <Feather
               name="chevron-right"
@@ -104,13 +69,28 @@ export default function Landing() {
   );
 }
 
+// ✅ Extracted reusable MarqueeRow component
+const MarqueeRow = ({ images, speed, rtl = false }) => (
+  <Marquee spacing={10} speed={speed} rtl={rtl} style={styles.marqueeRotate}>
+    <View style={styles.marquee}>
+      {images.map((image, index) => (
+        <Image
+          source={image}
+          key={`${rtl ? "rtl" : "ltr"}-image-${index}`}
+          style={styles.image}
+        />
+      ))}
+    </View>
+  </Marquee>
+);
+
 const Colors = {
-  PRIMARY: "#f97316", // Orange color for primary elements
-  PRIMARY_DARK: "#ea580c", // Darker orange for pressed states
+  PRIMARY: "#f97316",
+  PRIMARY_DARK: "#ea580c",
   WHITE: "#fff",
   GRAY: "#6b7280",
   LIGHT_GRAY: "#f5f5f5",
-  BACKGROUND_GRADIENT_START: "#fff7ed", // Light orange/peach
+  BACKGROUND_GRADIENT_START: "#fff7ed",
   BACKGROUND_GRADIENT_END: "#ffffff",
 };
 
@@ -126,13 +106,14 @@ const styles = StyleSheet.create({
   },
   marqueeRotate: {
     transform: [{ rotate: "-4deg" }],
+    marginVertical: 10,
   },
   marquee: {
     flexDirection: "row",
     alignItems: "center",
   },
   image: {
-    width: width * 0.35, // Responsive sizing based on screen width
+    width: width * 0.35,
     height: width * 0.35,
     margin: 5,
     borderRadius: 12,
@@ -145,14 +126,14 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.WHITE,
   },
   title: {
-    fontFamily: "Outfit-ExtraBold", // Make sure this font is loaded in your app
+    fontFamily: "Outfit-ExtraBold", // Ensure font is loaded
     fontSize: 24,
     textAlign: "center",
     marginBottom: 12,
     lineHeight: 32,
   },
   subtitle: {
-    fontFamily: "Outfit", // Make sure this font is loaded in your app
+    fontFamily: "Outfit", // Ensure font is loaded
     fontSize: 16,
     color: Colors.GRAY,
     textAlign: "center",
@@ -168,17 +149,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
   },
   buttonText: {
     color: Colors.WHITE,
-    fontFamily: "Outfit-Medium", // Make sure this font is loaded
+    fontFamily: "Outfit-Medium", // Ensure font is loaded
     fontSize: 18,
   },
   buttonIcon: {
