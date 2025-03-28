@@ -38,7 +38,7 @@ export default function Index() {
           setUserData(result);
         }
 
-        router.replace("/Landing");
+        router.replace("/(tabs)/Home");
       } catch (error) {
         console.error("Error fetching or creating user:", error);
       }
