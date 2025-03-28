@@ -4,6 +4,8 @@ import Landing from "./Landing";
 import { ClerkProvider } from "@clerk/clerk-expo";
 import { Slot } from "expo-router";
 import { tokenCache } from "@clerk/clerk-expo/token-cache";
+import { UserContext } from "@/context/UserContext";
+import { useState } from "react";
 
 export default function RootLayout() {
   const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!;
@@ -17,11 +19,15 @@ export default function RootLayout() {
     "Outfit-Regular": require("../assets/fonts/Outfit-Regular.ttf"),
     "Outfit-ExtraBold": require("../assets/fonts/Outfit-ExtraBold.ttf"),
   });
+
+  const [userData, setUserData] = useState();
   return (
     <ClerkProvider tokenCache={tokenCache} publishableKey={publishableKey}>
-      <Stack>
-        <Stack.Screen name="Landing" options={{ headerShown: false }} />
-      </Stack>
+      <UserContext.Provider value={{ userData, setUserData }}>
+        <Stack>
+          <Stack.Screen name="Landing" options={{ headerShown: false }} />
+        </Stack>
+      </UserContext.Provider>
     </ClerkProvider>
   );
 }
