@@ -53,7 +53,7 @@ export default function Landing() {
           <TouchableOpacity
             style={styles.button}
             activeOpacity={0.8}
-            onPress={() => router.push("/(auth)/sign-up")}
+            onPress={() => router.push("/(auth)/sign-in")}
           >
             <Text style={styles.buttonText}>Get Started</Text>
             <Feather

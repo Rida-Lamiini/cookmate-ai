@@ -54,7 +54,7 @@ export default function SignUpScreen() {
 
       if (signUpAttempt.status === "complete") {
         await setActive({ session: signUpAttempt.createdSessionId });
-        router.replace("/");
+        router.replace("/(tabs)/Home");
       } else {
         console.error("Verification not complete:", signUpAttempt);
         Alert.alert("Verification Error", "Please complete additional steps.");
