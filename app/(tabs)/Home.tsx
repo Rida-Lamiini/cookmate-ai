@@ -1,4 +1,5 @@
-import { View, Text } from "react-native";
+// Home.js - Updated for continuous flow
+import { View, Text, StyleSheet } from "react-native";
 import React from "react";
 import IntroSection from "@/components/IntroSection";
 import RecipeGenerator from "@/components/RecipeGenerator";
@@ -6,23 +7,21 @@ import {
   GestureHandlerRootView,
   ScrollView,
 } from "react-native-gesture-handler";
+import CategorySection from "@/components/CategorySection";
 
 export default function Home() {
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
+    <GestureHandlerRootView style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
       <ScrollView
         contentContainerStyle={{
           flexGrow: 1,
+          paddingBottom: 30,
         }}
       >
         <IntroSection />
-        {/* Recioe Genrerator ui */}
         <RecipeGenerator />
+        <CategorySection />
       </ScrollView>
-      {/* Wrap content with GestureHandlerRootView */}
-      {/* intro */}
-
-      {/* Category */}
     </GestureHandlerRootView>
   );
 }

@@ -1,6 +1,7 @@
+// IntroSection.js - Updated for continuous flow
 import { UserContext } from "@/context/UserContext";
 import React, { useContext, useState } from "react";
-import { View, Text, StyleSheet, Image, ImageBackground } from "react-native";
+import { View, Text, StyleSheet, Image } from "react-native";
 import { Switch } from "react-native-gesture-handler";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -8,7 +9,6 @@ const IntroSection = () => {
   const [enabled, setEnabled] = useState(false);
   const { userData } = useContext(UserContext);
 
-  // Get time of day for personalized greeting
   const getGreeting = () => {
     const hour = new Date().getHours();
     if (hour < 12) return "breakfast";
@@ -18,13 +18,7 @@ const IntroSection = () => {
 
   return (
     <View style={styles.container}>
-      <ImageBackground
-        source={{
-          uri: "https://images.unsplash.com/photo-1495195134817-aeb325a55b65?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80",
-        }}
-        style={styles.backgroundImage}
-        imageStyle={{ opacity: 0.2 }}
-      >
+      <View style={styles.backgroundGradient}>
         <View style={styles.section}>
           <View style={styles.profileRow}>
             <Image
@@ -39,8 +33,6 @@ const IntroSection = () => {
               </Text>
             </View>
           </View>
-
-          <View style={styles.divider} />
 
           <View style={styles.preferenceContainer}>
             <View style={styles.preferenceTextContainer}>
@@ -83,34 +75,26 @@ const IntroSection = () => {
             </View>
           </View>
         </View>
-      </ImageBackground>
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    borderRadius: 16,
-    overflow: "hidden",
-    marginHorizontal: 16,
-    marginVertical: 12,
-    elevation: 4,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-  },
-  backgroundImage: {
     width: "100%",
+  },
+  backgroundGradient: {
+    backgroundColor: "#FFF8E1",
+    paddingBottom: 15,
   },
   section: {
     padding: 20,
-    backgroundColor: "rgba(255, 255, 255, 0.9)",
   },
   profileRow: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 16,
+    marginBottom: 20,
   },
   profileImage: {
     width: 70,
@@ -137,11 +121,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#666",
     marginTop: 4,
-  },
-  divider: {
-    height: 1,
-    backgroundColor: "#E0E0E0",
-    marginVertical: 16,
   },
   preferenceContainer: {
     flexDirection: "row",

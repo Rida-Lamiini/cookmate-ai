@@ -1,3 +1,4 @@
+// RecipeGenerator.js - Updated styling
 import {
   View,
   Text,
@@ -53,7 +54,7 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: "#fff",
     padding: 20,
-    borderRadius: 12,
+    borderRadius: 16,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -63,37 +64,38 @@ const styles = StyleSheet.create({
   headerContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 20,
+    marginBottom: 16,
   },
   headerIcon: {
-    marginRight: 8,
+    marginRight: 10,
   },
   header: {
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: "bold",
     color: "#333",
   },
   inputContainer: {
-    marginBottom: 20,
+    marginBottom: 16,
   },
   input: {
     borderWidth: 1,
     borderColor: "#E0E0E0",
-    borderRadius: 8,
-    padding: 12,
+    borderRadius: 12,
+    padding: 14,
     fontSize: 16,
     backgroundColor: "#FAFAFA",
-    height: 100, // Set fixed height
+    height: 90,
     textAlignVertical: "top",
   },
   button: {
     flexDirection: "row",
     backgroundColor: "#FF9800",
-    paddingVertical: 12,
+    paddingVertical: 14,
     paddingHorizontal: 20,
-    borderRadius: 8,
+    borderRadius: 12,
     alignItems: "center",
     justifyContent: "center",
+    elevation: 2,
   },
   buttonIcon: {
     marginRight: 8,

@@ -46,11 +46,30 @@ const CreateUser = async (userData: {
     throw error;
   }
 };
+const GetCategories = async () => {
+  console.log("Fetching categories");
 
-// Export the functions correctly
+  try {
+    const { data, error } = await supabase.from("categories").select("*");
+
+    if (error) {
+      console.error("Error fetching categories:", error.message);
+      return null;
+    }
+
+    console.log("Categories fetched successfully:", data);
+    return data;
+  } catch (error) {
+    console.error("Error fetching categories:", error.message);
+    throw error;
+  }
+};
+
+// Export the functions
 const GlobalApi = {
   GetUserByEmail,
   CreateUser,
+  GetCategories, // Export the new API method
 };
 
 export default GlobalApi;
