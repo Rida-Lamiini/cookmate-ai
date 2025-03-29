@@ -14,6 +14,7 @@ export default function SignUpScreen() {
   const { isLoaded, signUp, setActive } = useSignUp();
   const router = useRouter();
 
+  const [username, setUsername] = useState("");
   const [emailAddress, setEmailAddress] = useState("");
   const [password, setPassword] = useState("");
   const [pendingVerification, setPendingVerification] = useState(false);
@@ -27,6 +28,7 @@ export default function SignUpScreen() {
 
     try {
       await signUp.create({
+        username: username.trim(),
         emailAddress: emailAddress.trim(),
         password,
       });
@@ -96,6 +98,13 @@ export default function SignUpScreen() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Sign up</Text>
+      <TextInput
+        autoCapitalize="none"
+        value={username}
+        placeholder="Enter username"
+        onChangeText={setUsername}
+        style={styles.input}
+      />
       <TextInput
         autoCapitalize="none"
         value={emailAddress}
