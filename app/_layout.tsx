@@ -27,6 +27,7 @@ export default function RootLayout() {
         <Stack>
           <Stack.Screen name="Landing" options={{ headerShown: false }} />
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="(auth)" options={{ headerShown: false }} />
         </Stack>
       </UserContext.Provider>
     </ClerkProvider>
