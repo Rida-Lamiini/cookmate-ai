@@ -8,9 +8,31 @@ import {
 } from "react-native";
 import React, { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
+import GlobalApi from "@/services/GlobalApi";
+import Prompt from "@/services/Prompt"; // Fixed import
 
 export default function RecipeGenerator() {
   const [ingredients, setIngredients] = useState("");
+  const [loading, setLoading] = useState(false); // Loading state
+
+  const OnGenerate = async () => {
+    if (!ingredients.trim()) {
+      alert("Please enter ingredients");
+      return;
+    }
+
+    setLoading(true); // Start loading
+    try {
+      const promptText = `${ingredients} ${Prompt.GENERATE_OPTION_PROMPT}`;
+      const result = await GlobalApi.AImodel(promptText);
+      console.log("AI Response:", result?.choices[0].message); // Handle response here
+    } catch (error) {
+      console.error("Error generating recipe:", error);
+      alert("Failed to generate recipe. Try again!");
+    } finally {
+      setLoading(false); // Stop loading
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -35,16 +57,19 @@ export default function RecipeGenerator() {
       </View>
 
       <TouchableOpacity
-        style={styles.button}
-        onPress={() => alert(`Generating recipes with: ${ingredients}`)}
+        style={[styles.button, loading && styles.disabledButton]}
+        onPress={OnGenerate}
+        disabled={loading}
       >
         <Ionicons
-          name="sparkles"
+          name={loading ? "sync" : "sparkles"}
           size={20}
           color="#fff"
           style={styles.buttonIcon}
         />
-        <Text style={styles.buttonText}>Generate Recipe</Text>
+        <Text style={styles.buttonText}>
+          {loading ? "Generating..." : "Generate Recipe"}
+        </Text>
       </TouchableOpacity>
     </View>
   );
@@ -104,5 +129,9 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 16,
     fontWeight: "600",
+  },
+  disabledButton: {
+    backgroundColor: "#FFA726",
+    opacity: 0.7,
   },
 });
