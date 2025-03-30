@@ -1,4 +1,5 @@
 import { supabase } from "@/utils/SupabaseConfig";
+import axios from "axios";
 import OpenAI from "openai";
 
 // Initialize OpenAI with OpenRouter
@@ -78,12 +79,40 @@ const AImodel = async (prompt: string) => {
     const response = await openai.chat.completions.create({
       model: "google/gemini-2.0-flash-lite-001",
       messages: [{ role: "user", content: prompt }],
+      response_format: { type: "json_object" },
     });
 
     console.log("AI Response:", response);
     return response;
   } catch (error) {
     console.error("Error generating AI response:", error);
+    return null;
+  }
+};
+const BASE_URL = "https://aigurulab.tech";
+const GenerateAiImage = async (input: string) => {
+  try {
+    const response = await axios.post(
+      BASE_URL + "/api/generate-image",
+      {
+        width: 1024,
+        height: 1024,
+        input: input,
+        model: "sdxl", //'flux'  // You can toggle this depending on the model you want to use
+        aspectRatio: "1:1", // Applicable to Flux model only
+      },
+      {
+        headers: {
+          "x-api-key": process.env.EXPO_PUBLIC_AIGURULAB_API_KEY, // Your API Key
+          "Content-Type": "application/json", // Content Type
+        },
+      }
+    );
+
+    console.log("AI Image Generated:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Error generating AI image:", error);
     return null;
   }
 };
@@ -94,6 +123,7 @@ const GlobalApi = {
   CreateUser,
   GetCategories,
   AImodel,
+  GenerateAiImage,
 };
 
 export default GlobalApi;
