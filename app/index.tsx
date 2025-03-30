@@ -15,7 +15,7 @@ export default function Index() {
     if (!user) return;
 
     const fetchUserData = async () => {
-      console.log("User from Clerk:", user.imageUrl);
+      console.log("User from Clerk:", user.username);
 
       try {
         const result = await GlobalApi.GetUserByEmail(
@@ -26,7 +26,7 @@ export default function Index() {
         if (!result) {
           const newUser = {
             email: user.primaryEmailAddress.emailAddress,
-            name: user.fullName || "Unknown User",
+            name: user.username || "Unknown User",
             picture: user.imageUrl,
           };
 
@@ -46,15 +46,4 @@ export default function Index() {
 
     fetchUserData();
   }, [user]);
-
-  return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <Text>User Data: {JSON.stringify(userData, null, 2)}</Text>
-      {createUserResponse && (
-        <Text>
-          New User Created: {JSON.stringify(createUserResponse, null, 2)}
-        </Text>
-      )}
-    </View>
-  );
 }
