@@ -56,7 +56,7 @@ export default function SignInPage() {
 
       if (signInAttempt.status === "complete") {
         await setActive({ session: signInAttempt.createdSessionId });
-        router.replace("/");
+        router.replace("/(tabs)/Home");
       } else {
         console.error("Sign-in not complete:", signInAttempt);
         Alert.alert("Sign-in Error", "Please complete additional steps.");
