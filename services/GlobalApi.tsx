@@ -5,7 +5,8 @@ import OpenAI from "openai";
 // Initialize OpenAI with OpenRouter
 const openai = new OpenAI({
   baseURL: "https://openrouter.ai/api/v1",
-  apiKey: process.env.EXPO_PUBLIC_OPENROUT_API_KEY,
+  apiKey:
+    "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",
 });
 
 // ✅ Get user by email
@@ -117,6 +118,49 @@ const GenerateAiImage = async (input: string) => {
   }
 };
 
+// ✅ Save Recipe to Database
+const SaveRecipeToDb = async (recipeData, user_email, imageUrl) => {
+  console.log("Saving recipe to database:", recipeData);
+  console.log("User email:", user_email);
+  console.log("Image URL:", imageUrl);
+
+  if (!recipeData?.user_email) {
+    console.error("No user email provided");
+    return { success: false, message: "User not logged in!" };
+  }
+
+  try {
+    const { data, error } = await supabase.from("complete_recipes").insert([
+      {
+        user_email: recipeData.user_email,
+        recipe_name: recipeData.recipeName,
+        description: recipeData.description,
+        ingredients: recipeData.ingredients,
+        steps: recipeData.steps,
+        calories: recipeData.calories,
+        cook_time: recipeData.cookTime,
+        serve_to: recipeData.serveTo,
+        image_prompt: recipeData.imagePrompt,
+        image_url: recipeData.imageUrl,
+      },
+    ]);
+
+    if (error) {
+      console.error("Error saving recipe:", error);
+      return { success: false, message: "Failed to save recipe. Try again!" };
+    }
+
+    console.log("Recipe saved successfully:", data);
+    return { success: true, message: "Recipe saved successfully!" };
+  } catch (error) {
+    console.error("Unexpected error while saving recipe:", error);
+    return {
+      success: false,
+      message: "An unexpected error occurred. Try again!",
+    };
+  }
+};
+
 // ✅ Export all API functions
 const GlobalApi = {
   GetUserByEmail,
@@ -124,6 +168,7 @@ const GlobalApi = {
   GetCategories,
   AImodel,
   GenerateAiImage,
+  SaveRecipeToDb,
 };
 
 export default GlobalApi;
