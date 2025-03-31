@@ -75,7 +75,7 @@ export default function RecipeGenerator() {
 
       const recipeData = Array.isArray(option) ? option[0] : option;
       const imageUrl = await GenerateRecipeImage(recipeData.imagePrompt);
-      console.log(recipeData.recipeName);
+      console.log(recipeData.recipe_name);
 
       // Save recipe to database
       const saveResponse = await SaveRecipeToDb({
@@ -110,6 +110,7 @@ export default function RecipeGenerator() {
 
   const SaveRecipeToDb = async (recipeData) => {
     console.log("Saving recipe to database:", recipeData);
+    console.log(recipeData.description);
 
     if (!recipeData?.user_email) {
       console.error("No user email provided");
@@ -120,7 +121,7 @@ export default function RecipeGenerator() {
       const { data, error } = await supabase.from("complete_recipes").insert([
         {
           user_email: recipeData.user_email,
-          recipe_name: recipeData.recipeName,
+          recipe_name: recipeData.recipe_name,
           description: recipeData.description,
           ingredients: recipeData.ingredients,
           steps: recipeData.steps,

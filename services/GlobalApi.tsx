@@ -6,7 +6,7 @@ import OpenAI from "openai";
 const openai = new OpenAI({
   baseURL: "https://openrouter.ai/api/v1",
   apiKey:
-    "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",
+    "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",
 });
 
 // ✅ Get user by email

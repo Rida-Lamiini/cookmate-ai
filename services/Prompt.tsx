@@ -21,6 +21,9 @@ export default {
     - Number of servings (as "serveTo")
     - A realistic image prompt for the recipe (as "imagePrompt")
         - A list of meal categories this recipe belongs to (as "categories"), such as ["Breakfast", "Lunch", "Dinner", "Dessert"]. Multiple categories can be assigned if applicable.
+    Ensure "recipe_name" is **always present**
+    Ensure "description" is **always present**
 
-      Response should be in JSON format only.`,
+      Response should be in JSON format only.
+      `,
 };
