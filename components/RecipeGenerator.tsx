@@ -109,6 +109,8 @@ export default function RecipeGenerator() {
   };
 
   const SaveRecipeToDb = async (recipeData) => {
+    console.log(typeof recipeData);
+
     console.log("Saving recipe to database:", recipeData);
     console.log(recipeData.description);
 
