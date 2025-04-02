@@ -14,8 +14,10 @@ import { UserContext } from "@/context/UserContext";
 import { supabase } from "@/utils/SupabaseConfig";
 import GlobalApi from "@/services/GlobalApi";
 import LoadingDialog from "./LoadingDIalog";
+import { useRouter } from "expo-router";
 
 export default function RecipeGenerator() {
+  const router = useRouter();
   const { userData } = useContext(UserContext);
 
   const actionSheetRef = useRef<ActionSheetRef>(null);
@@ -81,7 +83,18 @@ export default function RecipeGenerator() {
       const saveResponse = await SaveRecipeToDb({
         ...recipeData,
         user_email: userData?.email,
-        imageUrl: imageUrl,
+        image_url: imageUrl,
+      });
+
+      router.push({
+        pathname: "/recipe-detail",
+        params: {
+          recipe: JSON.stringify({
+            ...recipeData,
+            user_email: userData?.email,
+            image_url: imageUrl,
+          }),
+        },
       });
 
       if (saveResponse.success) {

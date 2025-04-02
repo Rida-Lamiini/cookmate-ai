@@ -65,6 +65,13 @@ export default function RecipeByCategory() {
         onPress={() => {
           // Navigate to recipe detail page (you would implement this)
           // router.push(`/recipe/${item.id}`);
+
+          router.push({
+            pathname: "/recipe-detail",
+            params: {
+              recipe: JSON.stringify(item),
+            },
+          });
         }}
       >
         <Image

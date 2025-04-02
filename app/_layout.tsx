@@ -34,6 +34,12 @@ export default function RootLayout() {
               headerShown: false,
             }}
           />
+          <Stack.Screen
+            name="recipe-detail/index"
+            options={{
+              headerShown: false,
+            }}
+          />
         </Stack>
       </UserContext.Provider>
     </ClerkProvider>
