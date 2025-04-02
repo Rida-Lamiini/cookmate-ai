@@ -160,12 +160,59 @@ const SaveRecipeToDb = async (recipeData, user_email, imageUrl) => {
     };
   }
 };
+// ✅ Get recipes by category name (with NOT condition)
+const GetRecipesByCategory = async (categoryName: string) => {
+  console.log("Fetching recipes excluding category:", categoryName);
 
-// ✅ Export all API functions
+  try {
+    const { data, error } = await supabase.from("complete_recipes").select("*");
+
+    if (error) {
+      console.error("Error fetching recipes:", error);
+      return [];
+    }
+
+    // Filter recipes where the category is NOT the provided categoryName
+    const filteredRecipes = data.filter((item) => {
+      try {
+        // Parse categories if it's a JSON string
+        const categories = JSON.parse(item.categories);
+
+        // Check if categories is an array and if it includes the category name (case insensitive)
+        return (
+          Array.isArray(categories) &&
+          categories.some(
+            (category) => category.toLowerCase() === categoryName.toLowerCase()
+          )
+        );
+      } catch (error) {
+        console.error("Error parsing categories:", error);
+        return false;
+      }
+    });
+    console.log(filteredRecipes);
+
+    // Log filtered recipes
+    filteredRecipes.forEach((item) => {
+      console.log(
+        `${item.recipe_name} does NOT belong to category: ${categoryName}`
+      );
+    });
+
+    console.log("Recipes fetched successfully:", filteredRecipes);
+    return filteredRecipes;
+  } catch (error) {
+    console.error("Unexpected error fetching recipes:", error);
+    return [];
+  }
+};
+
+// ✅ Export the new function
 const GlobalApi = {
   GetUserByEmail,
   CreateUser,
   GetCategories,
+  GetRecipesByCategory, // Added this function
   AImodel,
   GenerateAiImage,
   SaveRecipeToDb,
