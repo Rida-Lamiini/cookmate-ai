@@ -6,7 +6,7 @@ import OpenAI from "openai";
 const openai = new OpenAI({
   baseURL: "https://openrouter.ai/api/v1",
   apiKey:
-    "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",
+    "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",
 });
 
 // ✅ Get user by email
@@ -160,12 +160,23 @@ const SaveRecipeToDb = async (recipeData, user_email, imageUrl) => {
     };
   }
 };
-// ✅ Get recipes by category name (with NOT condition)
-const GetRecipesByCategory = async (categoryName: string) => {
-  console.log("Fetching recipes excluding category:", categoryName);
+const GetRecipesByCategory = async (
+  categoryName: string,
+  userEmail: string
+) => {
+  console.log(
+    "Fetching recipes for user:",
+    userEmail,
+    "excluding category:",
+    categoryName
+  );
 
   try {
-    const { data, error } = await supabase.from("complete_recipes").select("*");
+    // Fetch only recipes where user_email matches the provided email
+    const { data, error } = await supabase
+      .from("complete_recipes")
+      .select("*")
+      .eq("user_email", userEmail); // Filter by user email
 
     if (error) {
       console.error("Error fetching recipes:", error);
@@ -175,10 +186,8 @@ const GetRecipesByCategory = async (categoryName: string) => {
     // Filter recipes where the category is NOT the provided categoryName
     const filteredRecipes = data.filter((item) => {
       try {
-        // Parse categories if it's a JSON string
-        const categories = JSON.parse(item.categories);
+        const categories = JSON.parse(item.categories); // Parse categories if it's stored as JSON
 
-        // Check if categories is an array and if it includes the category name (case insensitive)
         return (
           Array.isArray(categories) &&
           categories.some(
@@ -190,16 +199,12 @@ const GetRecipesByCategory = async (categoryName: string) => {
         return false;
       }
     });
-    console.log(filteredRecipes);
 
-    // Log filtered recipes
-    filteredRecipes.forEach((item) => {
-      console.log(
-        `${item.recipe_name} does NOT belong to category: ${categoryName}`
-      );
-    });
-
-    console.log("Recipes fetched successfully:", filteredRecipes);
+    console.log(
+      "Recipes fetched successfully for user:",
+      userEmail,
+      filteredRecipes
+    );
     return filteredRecipes;
   } catch (error) {
     console.error("Unexpected error fetching recipes:", error);

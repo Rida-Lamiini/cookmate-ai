@@ -7,12 +7,15 @@ import {
   TouchableOpacity,
   ActivityIndicator,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import GlobalApi from "@/services/GlobalApi";
 import { Ionicons } from "@expo/vector-icons";
+import { UserContext } from "@/context/UserContext";
 
 export default function RecipeByCategory() {
+  const { userData } = useContext(UserContext);
+
   const params = useLocalSearchParams();
   const router = useRouter();
   const categoryName = Array.isArray(params.categoryName)
@@ -31,7 +34,10 @@ export default function RecipeByCategory() {
   const fetchRecipes = async () => {
     setLoading(true);
     try {
-      const result = await GlobalApi.GetRecipesByCategory(categoryName);
+      const result = await GlobalApi.GetRecipesByCategory(
+        categoryName,
+        userData.email
+      );
       if (result.length > 0) {
         setRecipes(result);
       } else {

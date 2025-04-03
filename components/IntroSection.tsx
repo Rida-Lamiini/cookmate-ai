@@ -8,6 +8,7 @@ import { Ionicons } from "@expo/vector-icons";
 const IntroSection = () => {
   const [enabled, setEnabled] = useState(false);
   const { userData } = useContext(UserContext);
+  console.log("User Data:", userData);
 
   const getGreeting = () => {
     const hour = new Date().getHours();
