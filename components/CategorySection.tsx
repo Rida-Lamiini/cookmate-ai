@@ -1,4 +1,4 @@
-// CategorySection.js - Updated for continuous flow
+// CategorySection.tsx - Updated for TypeScript & continuous flow
 import {
   View,
   Text,
@@ -9,9 +9,18 @@ import {
 import React, { useEffect, useState } from "react";
 import GlobalApi from "@/services/GlobalApi";
 import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
+
+// Define Category Type
+interface Category {
+  id: number;
+  name: string;
+  image_url?: string;
+}
 
 export default function CategorySection() {
-  const [categories, setCategories] = useState([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const router = useRouter();
 
   useEffect(() => {
     GetCategoryList();
@@ -20,13 +29,15 @@ export default function CategorySection() {
   const GetCategoryList = async () => {
     try {
       const result = await GlobalApi.GetCategories();
-      setCategories(result);
+      console.log("Categories fetched:", result);
+
+      setCategories((result as Category[]) || []); // Ensure it's an array
     } catch (error) {
       console.error("Error fetching categories:", error);
     }
   };
 
-  const getCategoryColor = (index) => {
+  const getCategoryColor = (index: number): string => {
     const colors = ["#FFF3E0", "#E8F5E9", "#E0F7FA", "#FFF8E1", "#F3E5F5"];
     return colors[index % colors.length];
   };
@@ -47,6 +58,12 @@ export default function CategorySection() {
         columnWrapperStyle={styles.gridRow}
         renderItem={({ item, index }) => (
           <TouchableOpacity
+            onPress={() => {
+              router.push({
+                pathname: "/recipe-by-category",
+                params: { categoryName: item.name }, // Fixed parameter
+              });
+            }}
             style={[
               styles.gridItem,
               { backgroundColor: getCategoryColor(index) },
@@ -54,7 +71,7 @@ export default function CategorySection() {
           >
             <View style={styles.iconWrapper}>
               <Ionicons
-                name={item.image_url || "restaurant-outline"}
+                name={item.image_url} // Fixed icon handling
                 size={28}
                 color="#FF9800"
               />
@@ -70,6 +87,7 @@ export default function CategorySection() {
   );
 }
 
+// Styles
 const styles = StyleSheet.create({
   container: {
     padding: 20,

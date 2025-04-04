@@ -28,6 +28,18 @@ export default function RootLayout() {
           <Stack.Screen name="Landing" options={{ headerShown: false }} />
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+          <Stack.Screen
+            name="recipe-by-category/index"
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name="recipe-detail/index"
+            options={{
+              headerShown: false,
+            }}
+          />
         </Stack>
       </UserContext.Provider>
     </ClerkProvider>

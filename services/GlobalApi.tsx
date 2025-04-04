@@ -5,7 +5,8 @@ import OpenAI from "openai";
 // Initialize OpenAI with OpenRouter
 const openai = new OpenAI({
   baseURL: "https://openrouter.ai/api/v1",
-  apiKey: process.env.EXPO_PUBLIC_OPENROUT_API_KEY,
+  apiKey:
+    "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",
 });
 
 // ✅ Get user by email
@@ -117,13 +118,109 @@ const GenerateAiImage = async (input: string) => {
   }
 };
 
-// ✅ Export all API functions
+// ✅ Save Recipe to Database
+const SaveRecipeToDb = async (recipeData, user_email, imageUrl) => {
+  console.log("Saving recipe to database:", recipeData);
+  console.log("User email:", user_email);
+  console.log("Image URL:", imageUrl);
+
+  if (!recipeData?.user_email) {
+    console.error("No user email provided");
+    return { success: false, message: "User not logged in!" };
+  }
+
+  try {
+    const { data, error } = await supabase.from("complete_recipes").insert([
+      {
+        user_email: recipeData.user_email,
+        recipe_name: recipeData.recipeName,
+        description: recipeData.description,
+        ingredients: recipeData.ingredients,
+        steps: recipeData.steps,
+        calories: recipeData.calories,
+        cook_time: recipeData.cookTime,
+        serve_to: recipeData.serveTo,
+        image_prompt: recipeData.imagePrompt,
+        image_url: recipeData.imageUrl,
+      },
+    ]);
+
+    if (error) {
+      console.error("Error saving recipe:", error);
+      return { success: false, message: "Failed to save recipe. Try again!" };
+    }
+
+    console.log("Recipe saved successfully:", data);
+    return { success: true, message: "Recipe saved successfully!" };
+  } catch (error) {
+    console.error("Unexpected error while saving recipe:", error);
+    return {
+      success: false,
+      message: "An unexpected error occurred. Try again!",
+    };
+  }
+};
+const GetRecipesByCategory = async (
+  categoryName: string,
+  userEmail: string
+) => {
+  console.log(
+    "Fetching recipes for user:",
+    userEmail,
+    "excluding category:",
+    categoryName
+  );
+
+  try {
+    // Fetch only recipes where user_email matches the provided email
+    const { data, error } = await supabase
+      .from("complete_recipes")
+      .select("*")
+      .eq("user_email", userEmail); // Filter by user email
+
+    if (error) {
+      console.error("Error fetching recipes:", error);
+      return [];
+    }
+
+    // Filter recipes where the category is NOT the provided categoryName
+    const filteredRecipes = data.filter((item) => {
+      try {
+        const categories = JSON.parse(item.categories); // Parse categories if it's stored as JSON
+
+        return (
+          Array.isArray(categories) &&
+          categories.some(
+            (category) => category.toLowerCase() === categoryName.toLowerCase()
+          )
+        );
+      } catch (error) {
+        console.error("Error parsing categories:", error);
+        return false;
+      }
+    });
+
+    console.log(
+      "Recipes fetched successfully for user:",
+      userEmail,
+      filteredRecipes
+    );
+    return filteredRecipes;
+  } catch (error) {
+    console.error("Unexpected error fetching recipes:", error);
+    return [];
+  }
+};
+
+// ✅ Export the new function
 const GlobalApi = {
   GetUserByEmail,
   CreateUser,
   GetCategories,
+  GetRecipesByCategory, // Added this function
   AImodel,
   GenerateAiImage,
+  SaveRecipeToDb,
 };
 
 export default GlobalApi;

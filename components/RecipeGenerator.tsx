@@ -6,14 +6,20 @@ import {
   StyleSheet,
   ScrollView,
 } from "react-native";
-import React, { useRef, useState } from "react";
+import React, { useContext, useRef, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
-import GlobalApi from "@/services/GlobalApi";
 import Prompt from "@/services/Prompt";
 import ActionSheet, { ActionSheetRef } from "react-native-actions-sheet";
+import { UserContext } from "@/context/UserContext";
+import { supabase } from "@/utils/SupabaseConfig";
+import GlobalApi from "@/services/GlobalApi";
 import LoadingDialog from "./LoadingDIalog";
+import { useRouter } from "expo-router";
 
 export default function RecipeGenerator() {
+  const router = useRouter();
+  const { userData } = useContext(UserContext);
+
   const actionSheetRef = useRef<ActionSheetRef>(null);
   const [recipeOptions, setRecipeOptions] = useState([]);
   const [ingredients, setIngredients] = useState("");
@@ -21,6 +27,8 @@ export default function RecipeGenerator() {
   const [openLoading, setOpenLoading] = useState(false);
 
   const OnGenerate = async () => {
+    console.log("5555");
+
     if (!ingredients.trim()) {
       alert("Please enter ingredients");
       return;
@@ -31,7 +39,6 @@ export default function RecipeGenerator() {
       const promptText = `${ingredients} ${Prompt.GENERATE_OPTION_PROMPT}`;
       const result = await GlobalApi.AImodel(promptText);
 
-      // Check if the response is valid
       if (result?.choices[0].message.content) {
         const options = JSON.parse(result?.choices[0].message.content);
         setRecipeOptions(options);
@@ -52,11 +59,49 @@ export default function RecipeGenerator() {
     try {
       const promptText = `${recipe} ${Prompt.GENERATE_COMPLETE_RECIPE}`;
       const result = await GlobalApi.AImodel(promptText);
-      const option = JSON.parse(result?.choices[0].message.content);
-      // console.log("Complete Recipe Response:", option);
-      console.log("image Recipe Response:", option[0].imagePrompt);
 
-      await GenerateRecipeImage(option[0].imagePrompt);
+      let option;
+      try {
+        option = JSON.parse(result?.choices[0].message.content);
+      } catch (jsonError) {
+        console.error("JSON Parsing Error:", jsonError);
+        alert("Failed to parse recipe data.");
+        return;
+      }
+
+      if (!option || (Array.isArray(option) && option.length === 0)) {
+        console.error("Invalid Recipe Response:", option);
+        alert("Invalid recipe data received. Please try again.");
+        return;
+      }
+
+      const recipeData = Array.isArray(option) ? option[0] : option;
+      const imageUrl = await GenerateRecipeImage(recipeData.imagePrompt);
+      console.log(recipeData.recipe_name);
+
+      // Save recipe to database
+      const saveResponse = await SaveRecipeToDb({
+        ...recipeData,
+        user_email: userData?.email,
+        image_url: imageUrl,
+      });
+
+      router.push({
+        pathname: "/recipe-detail",
+        params: {
+          recipe: JSON.stringify({
+            ...recipeData,
+            user_email: userData?.email,
+            image_url: imageUrl,
+          }),
+        },
+      });
+
+      if (saveResponse.success) {
+        alert(saveResponse.message); // Show success message
+      } else {
+        alert(saveResponse.message); // Show error message
+      }
     } catch (error) {
       console.error("Error generating complete recipe:", error);
       alert("Failed to generate complete recipe. Try again!");
@@ -69,10 +114,54 @@ export default function RecipeGenerator() {
     try {
       const result = await GlobalApi.GenerateAiImage(imagePrompt);
       console.log("Generated Image URL:", result.image);
-      // You can display the image here using the URL or save it for later.
+      return result.image;
     } catch (error) {
       console.error("Error generating image:", error);
       alert("Failed to generate image. Try again!");
+    }
+  };
+
+  const SaveRecipeToDb = async (recipeData) => {
+    console.log(typeof recipeData);
+
+    console.log("Saving recipe to database:", recipeData);
+    console.log(recipeData.description);
+
+    if (!recipeData?.user_email) {
+      console.error("No user email provided");
+      return { success: false, message: "User not logged in!" };
+    }
+
+    try {
+      const { data, error } = await supabase.from("complete_recipes").insert([
+        {
+          user_email: recipeData.user_email,
+          recipe_name: recipeData.recipe_name,
+          description: recipeData.description,
+          ingredients: recipeData.ingredients,
+          steps: recipeData.steps,
+          calories: recipeData.calories,
+          cook_time: recipeData.cookTime,
+          serve_to: recipeData.serveTo,
+          image_prompt: recipeData.imagePrompt,
+          image_url: recipeData.imageUrl,
+          categories: JSON.stringify(recipeData.categories),
+        },
+      ]);
+
+      if (error) {
+        console.error("Error saving recipe:", error);
+        return { success: false, message: "Failed to save recipe. Try again!" };
+      }
+
+      console.log("Recipe saved successfully:", data);
+      return { success: true, message: "Recipe saved successfully!" };
+    } catch (error) {
+      console.error("Unexpected error while saving recipe:", error);
+      return {
+        success: false,
+        message: "An unexpected error occurred. Try again!",
+      };
     }
   };
 
@@ -221,23 +310,17 @@ const styles = StyleSheet.create({
   actionSheetTitle: {
     fontSize: 20,
     fontWeight: "bold",
-    marginBottom: 16,
-    color: "#333333",
-    textAlign: "center",
+    marginBottom: 10,
   },
   recipeOption: {
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: "#eeeeee",
+    marginBottom: 12,
   },
   recipeName: {
     fontSize: 18,
     fontWeight: "600",
-    color: "#333333",
-    marginBottom: 4,
   },
   recipeDescription: {
     fontSize: 14,
-    color: "#666666",
+    color: "#888888",
   },
 });
